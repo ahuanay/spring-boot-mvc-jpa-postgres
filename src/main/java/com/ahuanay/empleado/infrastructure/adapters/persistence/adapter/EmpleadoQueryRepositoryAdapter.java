@@ -7,8 +7,8 @@ import com.ahuanay.empleado.application.query.getbyid.GetByIdEmpleadoResult;
 import com.ahuanay.empleado.infrastructure.adapters.persistence.entity.EmpleadoEntity;
 import com.ahuanay.empleado.infrastructure.adapters.persistence.repository.EmpleadoJpaRepository;
 import com.ahuanay.empleado.infrastructure.adapters.persistence.specification.EmpleadoSpecification;
-import com.ahuanay.mvccommon.application.pagination.PagedReadModel;
-import com.ahuanay.mvccommon.application.pagination.QueryPagination;
+import com.ahuanay.mvccommon.application.pagination.PagedResult;
+import com.ahuanay.mvccommon.application.pagination.Pagination;
 import com.ahuanay.mvccommon.infrastructure.adapters.persistence.JpaQueryUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -37,8 +37,8 @@ public class EmpleadoQueryRepositoryAdapter implements EmpleadoQueryRepository {
     }
 
     @Override
-    public PagedReadModel<GetAllEmpleadosResult> search(GetAllEmpleadosQuery query) {
-        QueryPagination queryPagination = query.pageable();
+    public PagedResult<GetAllEmpleadosResult> search(GetAllEmpleadosQuery query) {
+        Pagination queryPagination = query.pageable();
 
         Sort sort = JpaQueryUtils.resolverSort(
             queryPagination.sortBy(),
@@ -53,7 +53,7 @@ public class EmpleadoQueryRepositoryAdapter implements EmpleadoQueryRepository {
         Specification<EmpleadoEntity> specification = EmpleadoSpecification.conFiltros(query);
         Page<EmpleadoEntity> page = jpaRepository.findAll(specification, pageable);
 
-        return new PagedReadModel<>(
+        return new PagedResult<>(
             page.getContent().stream().map(this::toResult).toList(),
             page.getNumber(),
             page.getSize(),

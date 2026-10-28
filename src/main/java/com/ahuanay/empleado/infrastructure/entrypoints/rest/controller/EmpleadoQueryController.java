@@ -9,8 +9,8 @@ import com.ahuanay.empleado.application.query.getbyid.GetByIdEmpleadoResult;
 import com.ahuanay.empleado.domain.enums.Puesto;
 import com.ahuanay.empleado.infrastructure.entrypoints.rest.dto.EmpleadoRestResponse;
 import com.ahuanay.empleado.infrastructure.entrypoints.rest.mapper.EmpleadoRestMapper;
-import com.ahuanay.mvccommon.application.pagination.PagedReadModel;
-import com.ahuanay.mvccommon.application.pagination.QueryPagination;
+import com.ahuanay.mvccommon.application.pagination.PagedResult;
+import com.ahuanay.mvccommon.application.pagination.Pagination;
 import com.ahuanay.mvccommon.infrastructure.entrypoints.rest.dto.PageMetadata;
 import com.ahuanay.mvccommon.infrastructure.entrypoints.rest.dto.RestResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -193,7 +193,7 @@ public class EmpleadoQueryController {
         @Parameter(description = "Fecha final del rango de ingreso (YYYY-MM-DD).", example = "2026-12-31")
         @RequestParam(required = false) LocalDate fechaIngresoHasta
     ) {
-        QueryPagination queryPagination = new QueryPagination(page, size, sortBy, direction);
+        Pagination queryPagination = new Pagination(page, size, sortBy, direction);
 
         GetAllEmpleadosQuery query = new GetAllEmpleadosQuery(
             queryPagination,
@@ -207,7 +207,7 @@ public class EmpleadoQueryController {
             fechaIngresoHasta
         );
 
-        PagedReadModel<GetAllEmpleadosResult> result = getAllHandler.handle(query);
+        PagedResult<GetAllEmpleadosResult> result = getAllHandler.handle(query);
 
         List<EmpleadoRestResponse> contentRest = result.content().stream()
             .map(restMapper::toRestResponse)

@@ -2,8 +2,8 @@ package com.ahuanay.empleado.application.query.getall;
 
 import com.ahuanay.empleado.application.query.EmpleadoQueryRepository;
 import com.ahuanay.empleado.domain.enums.Puesto;
-import com.ahuanay.mvccommon.application.pagination.PagedReadModel;
-import com.ahuanay.mvccommon.application.pagination.QueryPagination;
+import com.ahuanay.mvccommon.application.pagination.PagedResult;
+import com.ahuanay.mvccommon.application.pagination.Pagination;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,7 +29,7 @@ class GetAllEmpleadosHandlerTest {
     @DisplayName("Debería delegar la búsqueda paginada al puerto de lectura")
     void deberiaRetornarEmpleadosPaginadosExitosamente() {
         // Arrange
-        QueryPagination pageable = new QueryPagination(0, 10, "nombre", "ASC");
+        Pagination pageable = new Pagination(0, 10, "nombre", "ASC");
         GetAllEmpleadosQuery query = new GetAllEmpleadosQuery(pageable, null, null, null, null, null, null, null, null);
 
         GetAllEmpleadosResult resumen = new GetAllEmpleadosResult(
@@ -40,7 +40,7 @@ class GetAllEmpleadosHandlerTest {
             Puesto.DESARROLLADOR_SENIOR
         );
 
-        PagedReadModel<GetAllEmpleadosResult> pagedMock = new PagedReadModel<>(
+        PagedResult<GetAllEmpleadosResult> pagedMock = new PagedResult<>(
             List.of(resumen),
             0,
             10,
@@ -52,7 +52,7 @@ class GetAllEmpleadosHandlerTest {
         when(empleadoQueryRepository.search(query)).thenReturn(pagedMock);
 
         // Act
-        PagedReadModel<GetAllEmpleadosResult> resultado = getAllEmpleadosHandler.handle(query);
+        PagedResult<GetAllEmpleadosResult> resultado = getAllEmpleadosHandler.handle(query);
 
         // Assert
         assertSame(pagedMock, resultado);
@@ -65,15 +65,15 @@ class GetAllEmpleadosHandlerTest {
     @DisplayName("Debería retornar una estructura paginada vacía cuando no existen empleados registrados")
     void deberiaRetornarPaginaVaciaCuandoNoHayEmpleados() {
         // Arrange
-        QueryPagination pageable = new QueryPagination(0, 10, "nombre", "ASC");
+        Pagination pageable = new Pagination(0, 10, "nombre", "ASC");
         GetAllEmpleadosQuery query = new GetAllEmpleadosQuery(pageable, null, null, null, null, null, null, null, null);
 
-        PagedReadModel<GetAllEmpleadosResult> pagedVacio = new PagedReadModel<>(List.of(), 0, 10, 0L, 0, true);
+        PagedResult<GetAllEmpleadosResult> pagedVacio = new PagedResult<>(List.of(), 0, 10, 0L, 0, true);
 
         when(empleadoQueryRepository.search(query)).thenReturn(pagedVacio);
 
         // Act
-        PagedReadModel<GetAllEmpleadosResult> resultado = getAllEmpleadosHandler.handle(query);
+        PagedResult<GetAllEmpleadosResult> resultado = getAllEmpleadosHandler.handle(query);
 
         // Assert
         assertTrue(resultado.content().isEmpty());

@@ -3,7 +3,7 @@ package com.ahuanay.empleado.infrastructure.adapters.persistence.specification;
 import com.ahuanay.empleado.application.query.getall.GetAllEmpleadosQuery;
 import com.ahuanay.empleado.domain.enums.Puesto;
 import com.ahuanay.empleado.infrastructure.adapters.persistence.entity.EmpleadoEntity;
-import com.ahuanay.mvccommon.application.pagination.QueryPagination;
+import com.ahuanay.mvccommon.application.pagination.Pagination;
 import jakarta.persistence.criteria.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 class EmpleadoSpecificationTest {
 
     private static Stream<Arguments> proveedorDeFiltrosSpecification() {
-        QueryPagination pageableParams = new QueryPagination(0, 10, "nombre", "ASC");
+        Pagination pageableParams = new Pagination(0, 10, "nombre", "ASC");
         return Stream.of(
             Arguments.of(new GetAllEmpleadosQuery(pageableParams, null, null, null, null, null, null, null, null)),
 

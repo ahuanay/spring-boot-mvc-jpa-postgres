@@ -6,8 +6,8 @@ import com.ahuanay.empleado.application.query.getbyid.GetByIdEmpleadoResult;
 import com.ahuanay.empleado.domain.enums.Puesto;
 import com.ahuanay.empleado.infrastructure.adapters.persistence.entity.EmpleadoEntity;
 import com.ahuanay.empleado.infrastructure.adapters.persistence.repository.EmpleadoJpaRepository;
-import com.ahuanay.mvccommon.application.pagination.PagedReadModel;
-import com.ahuanay.mvccommon.application.pagination.QueryPagination;
+import com.ahuanay.mvccommon.application.pagination.PagedResult;
+import com.ahuanay.mvccommon.application.pagination.Pagination;
 import com.ahuanay.mvccommon.infrastructure.entrypoints.rest.exception.ParametroInvalidoException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -70,7 +70,7 @@ class EmpleadoQueryRepositoryAdapterTest {
     @DisplayName("Debería mapear el listado paginado a read models y respetar el ordenamiento")
     void deberiaBuscarConPaginacionYMapearReadModels() {
         // Arrange
-        QueryPagination pageableParams = new QueryPagination(0, 10, "nombre", "DESC");
+        Pagination pageableParams = new Pagination(0, 10, "nombre", "DESC");
         GetAllEmpleadosQuery query = new GetAllEmpleadosQuery(
             pageableParams, null, null, null, null, null, null, null, null
         );
@@ -89,7 +89,7 @@ class EmpleadoQueryRepositoryAdapterTest {
             .thenReturn(new PageImpl<>(List.of(entidad), PageRequest.of(0, 10), 1));
 
         // Act
-        PagedReadModel<GetAllEmpleadosResult> resultado = empleadoReadRepositoryAdapter.search(query);
+        PagedResult<GetAllEmpleadosResult> resultado = empleadoReadRepositoryAdapter.search(query);
 
         // Assert
         assertEquals(1, resultado.content().size());
@@ -117,7 +117,7 @@ class EmpleadoQueryRepositoryAdapterTest {
     @DisplayName("Debería ordenar por fechaIngreso usando el nombre real de la propiedad JPA")
     void deberiaOrdenarPorFechaIngreso() {
         // Arrange
-        QueryPagination pageableParams = new QueryPagination(0, 10, "fechaingreso", "ASC");
+        Pagination pageableParams = new Pagination(0, 10, "fechaingreso", "ASC");
         GetAllEmpleadosQuery query = new GetAllEmpleadosQuery(
             pageableParams, null, null, null, null, null, null, null, null
         );
@@ -139,7 +139,7 @@ class EmpleadoQueryRepositoryAdapterTest {
     @DisplayName("Debería solicitar una búsqueda sin paginar cuando size es -1")
     void deberiaBuscarSinPaginacionCuandoSizeEsMenosUno() {
         // Arrange
-        QueryPagination pageableParams = new QueryPagination(0, -1, "id", "ASC");
+        Pagination pageableParams = new Pagination(0, -1, "id", "ASC");
         GetAllEmpleadosQuery query = new GetAllEmpleadosQuery(
             pageableParams, null, null, null, null, null, null, null, null
         );
@@ -160,7 +160,7 @@ class EmpleadoQueryRepositoryAdapterTest {
     @DisplayName("Debería rechazar un campo de ordenamiento no permitido")
     void deberiaRechazarCampoDeOrdenamientoNoPermitido() {
         // Arrange
-        QueryPagination pageableParams = new QueryPagination(0, 10, "campoInventado", "ASC");
+        Pagination pageableParams = new Pagination(0, 10, "campoInventado", "ASC");
         GetAllEmpleadosQuery query = new GetAllEmpleadosQuery(
             pageableParams, null, null, null, null, null, null, null, null
         );

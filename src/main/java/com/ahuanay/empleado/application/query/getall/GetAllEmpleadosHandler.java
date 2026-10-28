@@ -1,7 +1,7 @@
 package com.ahuanay.empleado.application.query.getall;
 
 import com.ahuanay.empleado.application.query.EmpleadoQueryRepository;
-import com.ahuanay.mvccommon.application.pagination.PagedReadModel;
+import com.ahuanay.mvccommon.application.pagination.PagedResult;
 import org.springframework.transaction.annotation.Transactional;
 
 public class GetAllEmpleadosHandler {
@@ -13,7 +13,7 @@ public class GetAllEmpleadosHandler {
     }
 
     @Transactional(readOnly = true)
-    public PagedReadModel<GetAllEmpleadosResult> handle(GetAllEmpleadosQuery query) {
+    public PagedResult<GetAllEmpleadosResult> handle(GetAllEmpleadosQuery query) {
         return empleadoQueryRepository.search(query);
     }
 }

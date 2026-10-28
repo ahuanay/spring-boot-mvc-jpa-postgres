@@ -1,13 +1,13 @@
 package com.ahuanay.empleado.application.query.getall;
 
 import com.ahuanay.empleado.domain.enums.Puesto;
-import com.ahuanay.mvccommon.application.pagination.QueryPagination;
+import com.ahuanay.mvccommon.application.pagination.Pagination;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record GetAllEmpleadosQuery(
-    QueryPagination pageable,
+    Pagination pageable,
     String nombre,
     String apellido,
     String email,
@@ -19,7 +19,7 @@ public record GetAllEmpleadosQuery(
 ) {
     public GetAllEmpleadosQuery {
         if (pageable == null) {
-            pageable = new QueryPagination(0, 10, "id", "ASC");
+            pageable = new Pagination(0, 10, "id", "ASC");
         }
     }
 }
