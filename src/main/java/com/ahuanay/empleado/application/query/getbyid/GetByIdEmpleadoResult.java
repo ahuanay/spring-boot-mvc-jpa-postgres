@@ -5,7 +5,7 @@ import com.ahuanay.empleado.domain.enums.Puesto;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public record EmpleadoDetailReadModel(
+public record GetByIdEmpleadoResult(
     Long id,
     String nombre,
     String apellido,

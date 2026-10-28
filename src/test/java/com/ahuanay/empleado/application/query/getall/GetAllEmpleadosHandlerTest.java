@@ -32,7 +32,7 @@ class GetAllEmpleadosHandlerTest {
         QueryPagination pageable = new QueryPagination(0, 10, "nombre", "ASC");
         GetAllEmpleadosQuery query = new GetAllEmpleadosQuery(pageable, null, null, null, null, null, null, null, null);
 
-        EmpleadoSummaryReadModel resumen = new EmpleadoSummaryReadModel(
+        GetAllEmpleadosResult resumen = new GetAllEmpleadosResult(
             1L,
             "Anderson Bryam",
             "Huanay Carhuaricra",
@@ -40,7 +40,7 @@ class GetAllEmpleadosHandlerTest {
             Puesto.DESARROLLADOR_SENIOR
         );
 
-        PagedReadModel<EmpleadoSummaryReadModel> pagedMock = new PagedReadModel<>(
+        PagedReadModel<GetAllEmpleadosResult> pagedMock = new PagedReadModel<>(
             List.of(resumen),
             0,
             10,
@@ -52,7 +52,7 @@ class GetAllEmpleadosHandlerTest {
         when(empleadoQueryRepository.search(query)).thenReturn(pagedMock);
 
         // Act
-        PagedReadModel<EmpleadoSummaryReadModel> resultado = getAllEmpleadosHandler.handle(query);
+        PagedReadModel<GetAllEmpleadosResult> resultado = getAllEmpleadosHandler.handle(query);
 
         // Assert
         assertSame(pagedMock, resultado);
@@ -68,12 +68,12 @@ class GetAllEmpleadosHandlerTest {
         QueryPagination pageable = new QueryPagination(0, 10, "nombre", "ASC");
         GetAllEmpleadosQuery query = new GetAllEmpleadosQuery(pageable, null, null, null, null, null, null, null, null);
 
-        PagedReadModel<EmpleadoSummaryReadModel> pagedVacio = new PagedReadModel<>(List.of(), 0, 10, 0L, 0, true);
+        PagedReadModel<GetAllEmpleadosResult> pagedVacio = new PagedReadModel<>(List.of(), 0, 10, 0L, 0, true);
 
         when(empleadoQueryRepository.search(query)).thenReturn(pagedVacio);
 
         // Act
-        PagedReadModel<EmpleadoSummaryReadModel> resultado = getAllEmpleadosHandler.handle(query);
+        PagedReadModel<GetAllEmpleadosResult> resultado = getAllEmpleadosHandler.handle(query);
 
         // Assert
         assertTrue(resultado.content().isEmpty());

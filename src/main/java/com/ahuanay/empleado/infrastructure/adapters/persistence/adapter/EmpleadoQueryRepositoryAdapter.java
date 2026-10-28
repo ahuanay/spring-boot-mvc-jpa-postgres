@@ -1,9 +1,9 @@
 package com.ahuanay.empleado.infrastructure.adapters.persistence.adapter;
 
 import com.ahuanay.empleado.application.query.EmpleadoQueryRepository;
-import com.ahuanay.empleado.application.query.getall.EmpleadoSummaryReadModel;
 import com.ahuanay.empleado.application.query.getall.GetAllEmpleadosQuery;
-import com.ahuanay.empleado.application.query.getbyid.EmpleadoDetailReadModel;
+import com.ahuanay.empleado.application.query.getall.GetAllEmpleadosResult;
+import com.ahuanay.empleado.application.query.getbyid.GetByIdEmpleadoResult;
 import com.ahuanay.empleado.infrastructure.adapters.persistence.entity.EmpleadoEntity;
 import com.ahuanay.empleado.infrastructure.adapters.persistence.repository.EmpleadoJpaRepository;
 import com.ahuanay.empleado.infrastructure.adapters.persistence.specification.EmpleadoSpecification;
@@ -32,12 +32,12 @@ public class EmpleadoQueryRepositoryAdapter implements EmpleadoQueryRepository {
     private final EmpleadoJpaRepository jpaRepository;
 
     @Override
-    public Optional<EmpleadoDetailReadModel> findDetailById(Long id) {
-        return jpaRepository.findDetailById(id);
+    public Optional<GetByIdEmpleadoResult> findResultById(Long id) {
+        return jpaRepository.findResultById(id);
     }
 
     @Override
-    public PagedReadModel<EmpleadoSummaryReadModel> search(GetAllEmpleadosQuery query) {
+    public PagedReadModel<GetAllEmpleadosResult> search(GetAllEmpleadosQuery query) {
         QueryPagination queryPagination = query.pageable();
 
         Sort sort = JpaQueryUtils.resolverSort(
@@ -54,7 +54,7 @@ public class EmpleadoQueryRepositoryAdapter implements EmpleadoQueryRepository {
         Page<EmpleadoEntity> page = jpaRepository.findAll(specification, pageable);
 
         return new PagedReadModel<>(
-            page.getContent().stream().map(this::toSummary).toList(),
+            page.getContent().stream().map(this::toResult).toList(),
             page.getNumber(),
             page.getSize(),
             page.getTotalElements(),
@@ -63,8 +63,8 @@ public class EmpleadoQueryRepositoryAdapter implements EmpleadoQueryRepository {
         );
     }
 
-    private EmpleadoSummaryReadModel toSummary(EmpleadoEntity entity) {
-        return new EmpleadoSummaryReadModel(
+    private GetAllEmpleadosResult toResult(EmpleadoEntity entity) {
+        return new GetAllEmpleadosResult(
             entity.getId(),
             entity.getNombre(),
             entity.getApellido(),

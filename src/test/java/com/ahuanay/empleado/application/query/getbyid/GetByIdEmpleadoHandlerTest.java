@@ -33,7 +33,7 @@ class GetByIdEmpleadoHandlerTest {
         Long empleadoId = 1L;
         GetByIdEmpleadoQuery query = new GetByIdEmpleadoQuery(empleadoId);
 
-        EmpleadoDetailReadModel readModel = new EmpleadoDetailReadModel(
+        GetByIdEmpleadoResult readModel = new GetByIdEmpleadoResult(
             empleadoId,
             "Anderson Bryam",
             "Huanay Carhuaricra",
@@ -43,14 +43,14 @@ class GetByIdEmpleadoHandlerTest {
             LocalDate.of(2025, 10, 15)
         );
 
-        when(empleadoQueryRepository.findDetailById(empleadoId)).thenReturn(Optional.of(readModel));
+        when(empleadoQueryRepository.findResultById(empleadoId)).thenReturn(Optional.of(readModel));
 
         // Act
-        EmpleadoDetailReadModel resultado = getByIdEmpleadoHandler.handle(query);
+        GetByIdEmpleadoResult resultado = getByIdEmpleadoHandler.handle(query);
 
         // Assert
         assertSame(readModel, resultado);
-        verify(empleadoQueryRepository, times(1)).findDetailById(empleadoId);
+        verify(empleadoQueryRepository, times(1)).findResultById(empleadoId);
     }
 
     @Test
@@ -60,7 +60,7 @@ class GetByIdEmpleadoHandlerTest {
         Long empleadoId = 99L;
         GetByIdEmpleadoQuery query = new GetByIdEmpleadoQuery(empleadoId);
 
-        when(empleadoQueryRepository.findDetailById(empleadoId)).thenReturn(Optional.empty());
+        when(empleadoQueryRepository.findResultById(empleadoId)).thenReturn(Optional.empty());
 
         // Act & Assert
         EmpleadoNotFoundException exception = assertThrows(

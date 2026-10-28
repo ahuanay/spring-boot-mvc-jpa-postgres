@@ -1,6 +1,6 @@
 package com.ahuanay.empleado.infrastructure.adapters.persistence.repository;
 
-import com.ahuanay.empleado.application.query.getbyid.EmpleadoDetailReadModel;
+import com.ahuanay.empleado.application.query.getbyid.GetByIdEmpleadoResult;
 import com.ahuanay.empleado.infrastructure.adapters.persistence.entity.EmpleadoEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -16,7 +16,7 @@ public interface EmpleadoJpaRepository extends JpaRepository<EmpleadoEntity, Lon
     boolean existsByEmailAndIdNot(String email, Long id);
 
     @Query("""
-        select new com.ahuanay.empleado.application.query.getbyid.EmpleadoDetailReadModel(
+        select new com.ahuanay.empleado.application.query.getbyid.GetByIdEmpleadoResult(
             e.id,
             e.nombre,
             e.apellido,
@@ -28,5 +28,5 @@ public interface EmpleadoJpaRepository extends JpaRepository<EmpleadoEntity, Lon
         from EmpleadoEntity e
         where e.id = :id
         """)
-    Optional<EmpleadoDetailReadModel> findDetailById(@Param("id") Long id);
+    Optional<GetByIdEmpleadoResult> findResultById(@Param("id") Long id);
 }

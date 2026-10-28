@@ -1,11 +1,11 @@
 package com.ahuanay.empleado.infrastructure.entrypoints.rest.controller;
 
-import com.ahuanay.empleado.application.query.getall.EmpleadoSummaryReadModel;
 import com.ahuanay.empleado.application.query.getall.GetAllEmpleadosHandler;
 import com.ahuanay.empleado.application.query.getall.GetAllEmpleadosQuery;
-import com.ahuanay.empleado.application.query.getbyid.EmpleadoDetailReadModel;
+import com.ahuanay.empleado.application.query.getall.GetAllEmpleadosResult;
 import com.ahuanay.empleado.application.query.getbyid.GetByIdEmpleadoHandler;
 import com.ahuanay.empleado.application.query.getbyid.GetByIdEmpleadoQuery;
+import com.ahuanay.empleado.application.query.getbyid.GetByIdEmpleadoResult;
 import com.ahuanay.empleado.domain.enums.Puesto;
 import com.ahuanay.empleado.infrastructure.entrypoints.rest.dto.EmpleadoRestResponse;
 import com.ahuanay.empleado.infrastructure.entrypoints.rest.mapper.EmpleadoRestMapper;
@@ -93,7 +93,7 @@ public class EmpleadoQueryController {
         @PathVariable Long id
     ) {
         GetByIdEmpleadoQuery query = new GetByIdEmpleadoQuery(id);
-        EmpleadoDetailReadModel readModel = getByIdHandler.handle(query);
+        GetByIdEmpleadoResult readModel = getByIdHandler.handle(query);
         EmpleadoRestResponse restResponse = restMapper.toRestResponse(readModel);
 
         RestResponse<EmpleadoRestResponse> response = RestResponse.success(
@@ -207,18 +207,18 @@ public class EmpleadoQueryController {
             fechaIngresoHasta
         );
 
-        PagedReadModel<EmpleadoSummaryReadModel> readModel = getAllHandler.handle(query);
+        PagedReadModel<GetAllEmpleadosResult> result = getAllHandler.handle(query);
 
-        List<EmpleadoRestResponse> contentRest = readModel.content().stream()
+        List<EmpleadoRestResponse> contentRest = result.content().stream()
             .map(restMapper::toRestResponse)
             .toList();
 
         PageMetadata pagination = new PageMetadata(
-            readModel.pageNumber(),
-            readModel.pageSize(),
-            readModel.totalElements(),
-            readModel.totalPages(),
-            readModel.isLast()
+            result.pageNumber(),
+            result.pageSize(),
+            result.totalElements(),
+            result.totalPages(),
+            result.isLast()
         );
 
         RestResponse<List<EmpleadoRestResponse>> response = RestResponse.successPage(

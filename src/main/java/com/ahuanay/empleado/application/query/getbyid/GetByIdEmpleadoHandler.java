@@ -2,6 +2,7 @@ package com.ahuanay.empleado.application.query.getbyid;
 
 import com.ahuanay.empleado.application.query.EmpleadoQueryRepository;
 import com.ahuanay.empleado.domain.exception.EmpleadoNotFoundException;
+import org.springframework.transaction.annotation.Transactional;
 
 public class GetByIdEmpleadoHandler {
 
@@ -11,8 +12,9 @@ public class GetByIdEmpleadoHandler {
         this.empleadoQueryRepository = empleadoQueryRepository;
     }
 
-    public EmpleadoDetailReadModel handle(GetByIdEmpleadoQuery query) {
-        return empleadoQueryRepository.findDetailById(query.id())
+    @Transactional(readOnly = true)
+    public GetByIdEmpleadoResult handle(GetByIdEmpleadoQuery query) {
+        return empleadoQueryRepository.findResultById(query.id())
             .orElseThrow(() -> new EmpleadoNotFoundException(query.id()));
     }
 }

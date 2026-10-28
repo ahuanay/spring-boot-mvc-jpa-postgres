@@ -59,7 +59,7 @@ docker compose version
 ### Opción 1 — Solo la base de datos en Docker (app local)
 
 Ideal para desarrollar: la base de datos corre en Docker y la aplicación se ejecuta con el perfil `dev` (puerto
-**8081**, BD en el puerto **5433**).
+**8080**, BD en el puerto **5433**).
 
 ```bash
 # 1. Levantar PostgreSQL (limpia el volumen anterior)
@@ -102,9 +102,9 @@ docker compose down -v --rmi local
 
 | Recurso          | Solo BD en Docker (app local)          | Todo en Docker                         |
 |------------------|----------------------------------------|----------------------------------------|
-| API de empleados | http://localhost:8081/api/v1/empleados | http://localhost:8080/api/v1/empleados |
-| Swagger UI       | http://localhost:8081/swagger-ui.html  | http://localhost:8080/swagger-ui.html  |
-| OpenAPI JSON     | http://localhost:8081/v3/api-docs      | http://localhost:8080/v3/api-docs      |
+| API de empleados | http://localhost:8080/api/v1/empleados | http://localhost:8080/api/v1/empleados |
+| Swagger UI       | http://localhost:8080/swagger-ui.html  | http://localhost:8080/swagger-ui.html  |
+| OpenAPI JSON     | http://localhost:8080/v3/api-docs      | http://localhost:8080/v3/api-docs      |
 
 ---
 

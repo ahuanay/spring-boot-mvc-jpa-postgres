@@ -34,7 +34,7 @@ logging:
     org.hibernate.SQL: DEBUG
 
 server:
-  port: 8081
+  port: 8080
 
 springdoc:
   api-docs:

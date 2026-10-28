@@ -2,7 +2,7 @@ package com.ahuanay.empleado.application.query.getall;
 
 import com.ahuanay.empleado.domain.enums.Puesto;
 
-public record EmpleadoSummaryReadModel(
+public record GetAllEmpleadosResult(
     Long id,
     String nombre,
     String apellido,

@@ -1,8 +1,8 @@
 package com.ahuanay.empleado.infrastructure.adapters.persistence.adapter;
 
-import com.ahuanay.empleado.application.query.getall.EmpleadoSummaryReadModel;
 import com.ahuanay.empleado.application.query.getall.GetAllEmpleadosQuery;
-import com.ahuanay.empleado.application.query.getbyid.EmpleadoDetailReadModel;
+import com.ahuanay.empleado.application.query.getall.GetAllEmpleadosResult;
+import com.ahuanay.empleado.application.query.getbyid.GetByIdEmpleadoResult;
 import com.ahuanay.empleado.domain.enums.Puesto;
 import com.ahuanay.empleado.infrastructure.adapters.persistence.entity.EmpleadoEntity;
 import com.ahuanay.empleado.infrastructure.adapters.persistence.repository.EmpleadoJpaRepository;
@@ -45,7 +45,7 @@ class EmpleadoQueryRepositoryAdapterTest {
     void deberiaProyectarDetalle() {
         // Arrange
         Long empleadoId = 1L;
-        EmpleadoDetailReadModel readModel = new EmpleadoDetailReadModel(
+        GetByIdEmpleadoResult readModel = new GetByIdEmpleadoResult(
             empleadoId,
             "Anderson Bryam",
             "Huanay Carhuaricra",
@@ -55,15 +55,15 @@ class EmpleadoQueryRepositoryAdapterTest {
             LocalDate.of(2025, 10, 15)
         );
 
-        when(jpaRepository.findDetailById(empleadoId)).thenReturn(Optional.of(readModel));
+        when(jpaRepository.findResultById(empleadoId)).thenReturn(Optional.of(readModel));
 
         // Act
-        Optional<EmpleadoDetailReadModel> resultado = empleadoReadRepositoryAdapter.findDetailById(empleadoId);
+        Optional<GetByIdEmpleadoResult> resultado = empleadoReadRepositoryAdapter.findResultById(empleadoId);
 
         // Assert
         assertTrue(resultado.isPresent());
         assertSame(readModel, resultado.get());
-        verify(jpaRepository, times(1)).findDetailById(empleadoId);
+        verify(jpaRepository, times(1)).findResultById(empleadoId);
     }
 
     @Test
@@ -89,7 +89,7 @@ class EmpleadoQueryRepositoryAdapterTest {
             .thenReturn(new PageImpl<>(List.of(entidad), PageRequest.of(0, 10), 1));
 
         // Act
-        PagedReadModel<EmpleadoSummaryReadModel> resultado = empleadoReadRepositoryAdapter.search(query);
+        PagedReadModel<GetAllEmpleadosResult> resultado = empleadoReadRepositoryAdapter.search(query);
 
         // Assert
         assertEquals(1, resultado.content().size());
@@ -99,7 +99,7 @@ class EmpleadoQueryRepositoryAdapterTest {
         assertEquals(1, resultado.totalPages());
         assertTrue(resultado.isLast());
 
-        EmpleadoSummaryReadModel resumen = resultado.content().getFirst();
+        GetAllEmpleadosResult resumen = resultado.content().getFirst();
         assertEquals(1L, resumen.id());
         assertEquals("Anderson Bryam", resumen.nombre());
         assertEquals("anderson.ahuanay@example.com", resumen.email());

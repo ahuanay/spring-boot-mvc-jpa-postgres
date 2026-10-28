@@ -1,11 +1,11 @@
 package com.ahuanay.empleado.infrastructure.entrypoints.rest.controller;
 
-import com.ahuanay.empleado.application.query.getall.EmpleadoSummaryReadModel;
 import com.ahuanay.empleado.application.query.getall.GetAllEmpleadosHandler;
 import com.ahuanay.empleado.application.query.getall.GetAllEmpleadosQuery;
-import com.ahuanay.empleado.application.query.getbyid.EmpleadoDetailReadModel;
+import com.ahuanay.empleado.application.query.getall.GetAllEmpleadosResult;
 import com.ahuanay.empleado.application.query.getbyid.GetByIdEmpleadoHandler;
 import com.ahuanay.empleado.application.query.getbyid.GetByIdEmpleadoQuery;
+import com.ahuanay.empleado.application.query.getbyid.GetByIdEmpleadoResult;
 import com.ahuanay.empleado.domain.enums.Puesto;
 import com.ahuanay.empleado.domain.exception.EmpleadoNotFoundException;
 import com.ahuanay.empleado.infrastructure.entrypoints.rest.dto.EmpleadoRestResponse;
@@ -49,7 +49,7 @@ class EmpleadoQueryControllerTest {
     void deberiaObtenerEmpleadoPorIdExitosamente() throws Exception {
         // Arrange
         Long empleadoId = 105L;
-        EmpleadoDetailReadModel detalleMock = new EmpleadoDetailReadModel(
+        GetByIdEmpleadoResult detalleMock = new GetByIdEmpleadoResult(
             empleadoId,
             "Anderson Bryam",
             "Huanay Carhuaricra",
@@ -70,7 +70,7 @@ class EmpleadoQueryControllerTest {
             .build();
 
         when(getByIdHandler.handle(any(GetByIdEmpleadoQuery.class))).thenReturn(detalleMock);
-        when(restMapper.toRestResponse(any(EmpleadoDetailReadModel.class))).thenReturn(restResponse);
+        when(restMapper.toRestResponse(any(GetByIdEmpleadoResult.class))).thenReturn(restResponse);
 
         // Act & Assert
         mockMvc.perform(get("/api/v1/empleados/{id}", empleadoId)
@@ -86,7 +86,7 @@ class EmpleadoQueryControllerTest {
             .andExpect(jsonPath("$.data.puesto").value("DESARROLLADOR_SENIOR"));
 
         verify(getByIdHandler, times(1)).handle(any(GetByIdEmpleadoQuery.class));
-        verify(restMapper, times(1)).toRestResponse(any(EmpleadoDetailReadModel.class));
+        verify(restMapper, times(1)).toRestResponse(any(GetByIdEmpleadoResult.class));
     }
 
     @Test
@@ -113,7 +113,7 @@ class EmpleadoQueryControllerTest {
     @DisplayName("GET /api/v1/empleados - Debería retornar lista paginada de empleados con RestResponse y status 200")
     void deberiaListarEmpleadosPaginadosExitosamente() throws Exception {
         // Arrange
-        EmpleadoSummaryReadModel resumenMock = new EmpleadoSummaryReadModel(
+        GetAllEmpleadosResult resumenMock = new GetAllEmpleadosResult(
             105L,
             "Anderson Bryam",
             "Huanay Carhuaricra",
@@ -121,7 +121,7 @@ class EmpleadoQueryControllerTest {
             Puesto.DESARROLLADOR_SENIOR
         );
 
-        PagedReadModel<EmpleadoSummaryReadModel> pagedMock = new PagedReadModel<>(
+        PagedReadModel<GetAllEmpleadosResult> pagedMock = new PagedReadModel<>(
             List.of(resumenMock),
             0,
             10,
@@ -139,7 +139,7 @@ class EmpleadoQueryControllerTest {
             .build();
 
         when(getAllHandler.handle(any(GetAllEmpleadosQuery.class))).thenReturn(pagedMock);
-        when(restMapper.toRestResponse(any(EmpleadoSummaryReadModel.class))).thenReturn(restResponse);
+        when(restMapper.toRestResponse(any(GetAllEmpleadosResult.class))).thenReturn(restResponse);
 
         // Act & Assert
         mockMvc.perform(get("/api/v1/empleados")
@@ -160,6 +160,6 @@ class EmpleadoQueryControllerTest {
             .andExpect(jsonPath("$.pagination.isLast").value(true));
 
         verify(getAllHandler, times(1)).handle(any(GetAllEmpleadosQuery.class));
-        verify(restMapper, times(1)).toRestResponse(any(EmpleadoSummaryReadModel.class));
+        verify(restMapper, times(1)).toRestResponse(any(GetAllEmpleadosResult.class));
     }
 }

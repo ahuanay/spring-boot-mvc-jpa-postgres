@@ -1,6 +1,6 @@
 package com.ahuanay.empleado.infrastructure.adapters.persistence.repository;
 
-import com.ahuanay.empleado.application.query.getbyid.EmpleadoDetailReadModel;
+import com.ahuanay.empleado.application.query.getbyid.GetByIdEmpleadoResult;
 import com.ahuanay.empleado.domain.enums.Puesto;
 import com.ahuanay.empleado.infrastructure.adapters.persistence.entity.EmpleadoEntity;
 import org.junit.jupiter.api.DisplayName;
@@ -76,11 +76,11 @@ class EmpleadoJpaRepositoryTest {
         testEntityManager.clear();
 
         // Act
-        Optional<EmpleadoDetailReadModel> detalle = repository.findDetailById(entity.getId());
+        Optional<GetByIdEmpleadoResult> detalle = repository.findResultById(entity.getId());
 
         // Assert
         assertTrue(detalle.isPresent());
-        EmpleadoDetailReadModel readModel = detalle.get();
+        GetByIdEmpleadoResult readModel = detalle.get();
         assertEquals(entity.getId(), readModel.id());
         assertEquals(NOMBRE, readModel.nombre());
         assertEquals(APELLIDO, readModel.apellido());
@@ -99,7 +99,7 @@ class EmpleadoJpaRepositoryTest {
         testEntityManager.clear();
 
         // Act
-        Optional<EmpleadoDetailReadModel> detalle = repository.findDetailById(eliminado.getId());
+        Optional<GetByIdEmpleadoResult> detalle = repository.findResultById(eliminado.getId());
 
         // Assert
         assertTrue(detalle.isEmpty());
