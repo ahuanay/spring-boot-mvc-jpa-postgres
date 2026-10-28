@@ -1,3 +1,10 @@
 spring:
   application:
-    name: spring-boot-mvc-jpa-postgres
+    name: empleado-service
+  profiles:
+    active: dev
+  jpa:
+    open-in-view: false
+  threads:
+    virtual:
+      enabled: true

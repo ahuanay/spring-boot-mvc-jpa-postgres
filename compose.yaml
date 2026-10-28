@@ -1,0 +1,56 @@
+services:
+  postgres-empleados-db:
+    image: postgres:16-alpine
+    container_name: postgres-empleados
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-db_empleados}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - empleados-net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-db_empleados}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  empleados-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: empleados-api
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-empleados-db:5432/${DB_NAME:-db_empleados}
+      - SPRING_DATASOURCE_USERNAME=${DB_USER:-postgres}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD:-postgres}
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SWAGGER_ENABLED=${SWAGGER_ENABLED:-true}
+    networks:
+      - empleados-net
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
+    depends_on:
+      postgres-empleados-db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+
+networks:
+  empleados-net:
+    driver: bridge

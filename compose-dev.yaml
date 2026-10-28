@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  postgres-empleados-db:
+    image: postgres:16-alpine
+    container_name: postgres-empleados
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: db_empleados
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d db_empleados" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  postgres_data:

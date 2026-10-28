@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -14,7 +14,9 @@
     <artifactId>empleado-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>spring-boot-mvc-jpa-postgres</name>
-    <description>Servicio de gestión de empleados desarrollado con Spring Boot, Spring MVC, Spring Data JPA y PostgreSQL</description>
+    <description>Servicio de gestión de empleados desarrollado con Spring Boot, Spring MVC, Spring Data JPA y
+        PostgreSQL
+    </description>
 
     <properties>
         <java.version>21</java.version>
@@ -26,10 +28,8 @@
 
         <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
         <sonar.coverage.exclusions>
-            **/SpringBootMvcJpaPostgresApplication.java,
-            **/AuditableEntity.java,
             **/*MapperImpl.java,
-            **/common/infrastructure/config/**
+            com/ahuanay/empleado/infrastructure/config/**
         </sonar.coverage.exclusions>
     </properties>
 
@@ -160,6 +160,7 @@
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.12</version>
                 <executions>
+
                     <execution>
                         <goals>
                             <goal>prepare-agent</goal>
@@ -199,10 +200,8 @@
                 </executions>
                 <configuration>
                     <excludes>
-                        <exclude>com/ahuanay/empleado/common/infrastructure/adapters/persistence/entity/AuditableEntity.class</exclude>
-                        <exclude>com/ahuanay/empleado/common/infrastructure/config/**</exclude>
-                        <exclude>com/ahuanay/empleado/SpringBootMvcJpaPostgresApplication.class</exclude>
                         <exclude>**/*MapperImpl*</exclude>
+                        <exclude>com/ahuanay/empleado/infrastructure/config/**</exclude>
                     </excludes>
                 </configuration>
             </plugin>

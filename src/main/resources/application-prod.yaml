@@ -1,0 +1,51 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:postgres-empleados-db}:${DB_PORT:5432}/db_empleados
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      idle-timeout: 30000
+      connection-timeout: 20000
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+logging:
+  file:
+    name: logs/empleado-service.log
+  logback:
+    rollingpolicy:
+      max-file-size: 50MB
+      max-history: 90
+      total-size-cap: 5GB
+  level:
+    root: INFO
+    com.ahuanay.empleado: INFO
+    org.springframework.web: WARN
+    org.hibernate.SQL: ERROR
+
+server:
+  port: ${PORT:8080}
+  servlet:
+    context-path: /
+
+springdoc:
+  api-docs:
+    enabled: ${SWAGGER_ENABLED:false}
+  swagger-ui:
+    enabled: ${SWAGGER_ENABLED:false}

@@ -1,0 +1,167 @@
+package com.ahuanay.empleado.infrastructure.entrypoints.rest.controller;
+
+import com.ahuanay.empleado.application.query.getall.EmpleadoSummaryReadModel;
+import com.ahuanay.empleado.application.query.getall.GetAllEmpleadosHandler;
+import com.ahuanay.empleado.application.query.getall.GetAllEmpleadosQuery;
+import com.ahuanay.empleado.application.query.getbyid.EmpleadoDetailReadModel;
+import com.ahuanay.empleado.application.query.getbyid.GetByIdEmpleadoHandler;
+import com.ahuanay.empleado.application.query.getbyid.GetByIdEmpleadoQuery;
+import com.ahuanay.empleado.common.application.pagination.PagedReadModel;
+import com.ahuanay.empleado.common.infrastructure.entrypoints.rest.dto.PageRestResponse;
+import com.ahuanay.empleado.domain.enums.Puesto;
+import com.ahuanay.empleado.domain.exception.EmpleadoNotFoundException;
+import com.ahuanay.empleado.infrastructure.entrypoints.rest.dto.EmpleadoRestResponse;
+import com.ahuanay.empleado.infrastructure.entrypoints.rest.mapper.EmpleadoRestMapper;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@WebMvcTest(EmpleadoQueryController.class)
+class EmpleadoQueryControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockitoBean
+    private GetByIdEmpleadoHandler getByIdHandler;
+
+    @MockitoBean
+    private GetAllEmpleadosHandler getAllHandler;
+
+    @MockitoBean
+    private EmpleadoRestMapper restMapper;
+
+    @Test
+    @DisplayName("GET /api/v1/empleados/{id} - Debería retornar el detalle del empleado y status 200")
+    void deberiaObtenerEmpleadoPorIdExitosamente() throws Exception {
+        // Arrange
+        Long empleadoId = 105L;
+        EmpleadoDetailReadModel detalleMock = new EmpleadoDetailReadModel(
+            empleadoId,
+            "Anderson Bryam",
+            "Huanay Carhuaricra",
+            "anderson.ahuanay@example.com",
+            Puesto.DESARROLLADOR_SENIOR,
+            new BigDecimal("4500.00"),
+            LocalDate.of(2025, 10, 15)
+        );
+
+        EmpleadoRestResponse restResponse = EmpleadoRestResponse.builder()
+            .id(empleadoId)
+            .nombre("Anderson Bryam")
+            .apellido("Huanay Carhuaricra")
+            .email("anderson.ahuanay@example.com")
+            .puesto(Puesto.DESARROLLADOR_SENIOR)
+            .salario(new BigDecimal("4500.00"))
+            .fechaIngreso(LocalDate.of(2025, 10, 15))
+            .build();
+
+        when(getByIdHandler.handle(any(GetByIdEmpleadoQuery.class))).thenReturn(detalleMock);
+        when(restMapper.toRestResponse(any(EmpleadoDetailReadModel.class))).thenReturn(restResponse);
+
+        // Act & Assert
+        mockMvc.perform(get("/api/v1/empleados/{id}", empleadoId)
+                .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(empleadoId))
+            .andExpect(jsonPath("$.nombre").value("Anderson Bryam"))
+            .andExpect(jsonPath("$.apellido").value("Huanay Carhuaricra"))
+            .andExpect(jsonPath("$.email").value("anderson.ahuanay@example.com"))
+            .andExpect(jsonPath("$.puesto").value("DESARROLLADOR_SENIOR"));
+
+        verify(getByIdHandler, times(1)).handle(any(GetByIdEmpleadoQuery.class));
+        verify(restMapper, times(1)).toRestResponse(any(EmpleadoDetailReadModel.class));
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/empleados/{id} - Debería retornar 404 cuando el ID consultado no existe")
+    void deberiaRetornar404CuandoEmpleadoNoExiste() throws Exception {
+        // Arrange
+        Long empleadoId = 99L;
+        when(getByIdHandler.handle(any(GetByIdEmpleadoQuery.class)))
+            .thenThrow(new EmpleadoNotFoundException(empleadoId));
+
+        // Act & Assert
+        mockMvc.perform(get("/api/v1/empleados/{id}", empleadoId)
+                .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.status").value(404))
+            .andExpect(jsonPath("$.error").value("Not Found"))
+            .andExpect(jsonPath("$.message").value("No se encontró el recurso solicitado."))
+            .andExpect(jsonPath("$.notFoundIds[0]").value(99));
+
+        verify(getByIdHandler, times(1)).handle(any(GetByIdEmpleadoQuery.class));
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/empleados - Debería retornar lista paginada de empleados y status 200")
+    void deberiaListarEmpleadosPaginadosExitosamente() throws Exception {
+        // Arrange
+        EmpleadoSummaryReadModel resumenMock = new EmpleadoSummaryReadModel(
+            105L,
+            "Anderson Bryam",
+            "Huanay Carhuaricra",
+            "anderson.ahuanay@example.com",
+            Puesto.DESARROLLADOR_SENIOR
+        );
+
+        PagedReadModel<EmpleadoSummaryReadModel> pagedMock = new PagedReadModel<>(
+            List.of(resumenMock),
+            0,
+            10,
+            1L,
+            1,
+            true
+        );
+
+        EmpleadoRestResponse restResponse = EmpleadoRestResponse.builder()
+            .id(105L)
+            .nombre("Anderson Bryam")
+            .apellido("Huanay Carhuaricra")
+            .email("anderson.ahuanay@example.com")
+            .puesto(Puesto.DESARROLLADOR_SENIOR)
+            .build();
+
+        PageRestResponse<EmpleadoRestResponse> pageRest = new PageRestResponse<>(
+            List.of(restResponse),
+            0,
+            10,
+            1L,
+            1,
+            true
+        );
+
+        when(getAllHandler.handle(any(GetAllEmpleadosQuery.class))).thenReturn(pagedMock);
+        when(restMapper.toPageRest(any())).thenReturn(pageRest);
+
+        // Act & Assert
+        mockMvc.perform(get("/api/v1/empleados")
+                .param("page", "0")
+                .param("size", "10")
+                .param("sortBy", "id")
+                .param("direction", "ASC")
+                .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.content").isArray())
+            .andExpect(jsonPath("$.content[0].id").value(105L))
+            .andExpect(jsonPath("$.content[0].nombre").value("Anderson Bryam"))
+            .andExpect(jsonPath("$.totalElements").value(1));
+
+        verify(getAllHandler, times(1)).handle(any(GetAllEmpleadosQuery.class));
+        verify(restMapper, times(1)).toPageRest(any());
+    }
+}
