@@ -10,7 +10,7 @@ import com.ahuanay.empleado.domain.enums.Puesto;
 import com.ahuanay.empleado.domain.exception.EmpleadoNotFoundException;
 import com.ahuanay.empleado.infrastructure.entrypoints.rest.dto.EmpleadoRestResponse;
 import com.ahuanay.empleado.infrastructure.entrypoints.rest.mapper.EmpleadoRestMapper;
-import com.ahuanay.mvccommon.application.pagination.PagedReadModel;
+import com.ahuanay.mvccommon.application.pagination.PagedResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -121,7 +121,7 @@ class EmpleadoQueryControllerTest {
             Puesto.DESARROLLADOR_SENIOR
         );
 
-        PagedReadModel<GetAllEmpleadosResult> pagedMock = new PagedReadModel<>(
+        PagedResult<GetAllEmpleadosResult> pagedMock = new PagedResult<>(
             List.of(resumenMock),
             0,
             10,
