@@ -1,9 +1,9 @@
 package com.ahuanay.empleado.application.query.getall;
 
 import com.ahuanay.empleado.application.query.EmpleadoQueryRepository;
-import com.ahuanay.empleado.common.application.pagination.PagedReadModel;
-import com.ahuanay.empleado.common.application.pagination.QueryPagination;
 import com.ahuanay.empleado.domain.enums.Puesto;
+import com.ahuanay.mvccommon.application.pagination.PagedReadModel;
+import com.ahuanay.mvccommon.application.pagination.QueryPagination;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

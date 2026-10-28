@@ -25,6 +25,7 @@
         <lombok.version>1.18.36</lombok.version>
         <mapstruct.version>1.6.3</mapstruct.version>
         <springdoc.version>2.8.4</springdoc.version>
+        <mvc-common.version>1.0.0</mvc-common.version>
 
         <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
         <sonar.coverage.exclusions>
@@ -33,7 +34,20 @@
         </sonar.coverage.exclusions>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
     <dependencies>
+        <dependency>
+            <groupId>com.github.ahuanay</groupId>
+            <artifactId>spring-boot-mvc-common</artifactId>
+            <version>${mvc-common.version}</version>
+        </dependency>
+
         <!-- Spring Boot Starters -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -160,7 +174,6 @@
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.12</version>
                 <executions>
-
                     <execution>
                         <goals>
                             <goal>prepare-agent</goal>

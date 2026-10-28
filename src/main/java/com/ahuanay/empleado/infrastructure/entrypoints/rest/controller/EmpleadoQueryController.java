@@ -6,13 +6,13 @@ import com.ahuanay.empleado.application.query.getall.GetAllEmpleadosQuery;
 import com.ahuanay.empleado.application.query.getbyid.EmpleadoDetailReadModel;
 import com.ahuanay.empleado.application.query.getbyid.GetByIdEmpleadoHandler;
 import com.ahuanay.empleado.application.query.getbyid.GetByIdEmpleadoQuery;
-import com.ahuanay.empleado.common.application.pagination.PagedReadModel;
-import com.ahuanay.empleado.common.application.pagination.QueryPagination;
-import com.ahuanay.empleado.common.infrastructure.entrypoints.rest.dto.ErrorRestResponse;
-import com.ahuanay.empleado.common.infrastructure.entrypoints.rest.dto.PageRestResponse;
 import com.ahuanay.empleado.domain.enums.Puesto;
 import com.ahuanay.empleado.infrastructure.entrypoints.rest.dto.EmpleadoRestResponse;
 import com.ahuanay.empleado.infrastructure.entrypoints.rest.mapper.EmpleadoRestMapper;
+import com.ahuanay.mvccommon.application.pagination.PagedReadModel;
+import com.ahuanay.mvccommon.application.pagination.QueryPagination;
+import com.ahuanay.mvccommon.infrastructure.entrypoints.rest.dto.PageMetadata;
+import com.ahuanay.mvccommon.infrastructure.entrypoints.rest.dto.RestResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -22,12 +22,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/empleados")
@@ -53,19 +55,25 @@ public class EmpleadoQueryController {
             description = "Detalle del empleado recuperado con éxito.",
             content = @Content(
                 mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = EmpleadoRestResponse.class),
+                schema = @Schema(implementation = RestResponse.class),
                 examples = @ExampleObject(
                     name = "EmpleadoSenior",
                     summary = "Empleado activo con puesto senior",
                     value = """
                         {
-                            "id": 105,
-                            "nombre": "Anderson Bryam",
-                            "apellido": "Huanay Carhuaricra",
-                            "email": "ahuanay@email.com",
-                            "puesto": "DESARROLLADOR_SENIOR",
-                            "salario": 4500.00,
-                            "fechaIngreso": "2026-10-26"
+                            "timestamp": "2026-10-28T18:45:30.123",
+                            "status": 200,
+                            "success": true,
+                            "message": "Detalle del empleado recuperado con éxito",
+                            "data": {
+                                "id": 105,
+                                "nombre": "Anderson Bryam",
+                                "apellido": "Huanay Carhuaricra",
+                                "email": "ahuanay@email.com",
+                                "puesto": "DESARROLLADOR_SENIOR",
+                                "salario": 4500.00,
+                                "fechaIngreso": "2026-10-26"
+                            }
                         }
                         """
                 )
@@ -76,17 +84,25 @@ public class EmpleadoQueryController {
             description = "Empleado no encontrado o inactivo por borrado lógico.",
             content = @Content(
                 mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = ErrorRestResponse.class)
+                schema = @Schema(implementation = RestResponse.class)
             )
         )
     })
-    public ResponseEntity<EmpleadoRestResponse> getById(
+    public ResponseEntity<RestResponse<EmpleadoRestResponse>> getById(
         @Parameter(description = "ID único del empleado a consultar.", example = "105", required = true)
         @PathVariable Long id
     ) {
         GetByIdEmpleadoQuery query = new GetByIdEmpleadoQuery(id);
         EmpleadoDetailReadModel readModel = getByIdHandler.handle(query);
-        return ResponseEntity.ok(restMapper.toRestResponse(readModel));
+        EmpleadoRestResponse restResponse = restMapper.toRestResponse(readModel);
+
+        RestResponse<EmpleadoRestResponse> response = RestResponse.success(
+            HttpStatus.OK.value(),
+            "Detalle del empleado recuperado con éxito",
+            restResponse
+        );
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -100,13 +116,17 @@ public class EmpleadoQueryController {
             description = "Página de datos obtenida exitosamente.",
             content = @Content(
                 mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = PageRestResponse.class),
+                schema = @Schema(implementation = RestResponse.class),
                 examples = @ExampleObject(
                     name = "PaginaEmpleados",
                     summary = "Primera página con un empleado activo",
                     value = """
                         {
-                            "content": [
+                            "timestamp": "2026-10-28T18:45:30.123",
+                            "status": 200,
+                            "success": true,
+                            "message": "Listado de empleados obtenido exitosamente",
+                            "data": [
                                 {
                                     "id": 105,
                                     "nombre": "Anderson Bryam",
@@ -115,11 +135,13 @@ public class EmpleadoQueryController {
                                     "puesto": "DESARROLLADOR_SENIOR"
                                 }
                             ],
-                            "pageNumber": 0,
-                            "pageSize": 10,
-                            "totalElements": 1,
-                            "totalPages": 1,
-                            "isLast": true
+                            "pagination": {
+                                "pageNumber": 0,
+                                "pageSize": 10,
+                                "totalElements": 1,
+                                "totalPages": 1,
+                                "isLast": true
+                            }
                         }
                         """
                 )
@@ -130,15 +152,11 @@ public class EmpleadoQueryController {
             description = "Filtro de búsqueda con formato no válido o parámetro de ordenamiento no soportado.",
             content = @Content(
                 mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = ErrorRestResponse.class),
-                examples = @ExampleObject(
-                    name = "ParametroInvalido",
-                    value = "{\"timestamp\": \"2026-10-27T14:30:00\", \"status\": 400, \"error\": \"Bad Request\", \"message\": \"El parámetro 'sortBy' con valor 'salarioInvalido' no es válido. Valores permitidos: apellido, email, fechaIngreso, id, nombre, puesto, salario.\", \"path\": \"/api/v1/empleados\"}"
-                )
+                schema = @Schema(implementation = RestResponse.class)
             )
         )
     })
-    public ResponseEntity<PageRestResponse<EmpleadoRestResponse>> getAll(
+    public ResponseEntity<RestResponse<List<EmpleadoRestResponse>>> getAll(
         @Parameter(description = "Número de página a consultar (Base cero).", example = "0")
         @RequestParam(defaultValue = "0") int page,
 
@@ -190,6 +208,26 @@ public class EmpleadoQueryController {
         );
 
         PagedReadModel<EmpleadoSummaryReadModel> readModel = getAllHandler.handle(query);
-        return ResponseEntity.ok(restMapper.toPageRest(readModel));
+
+        List<EmpleadoRestResponse> contentRest = readModel.content().stream()
+            .map(restMapper::toRestResponse)
+            .toList();
+
+        PageMetadata pagination = new PageMetadata(
+            readModel.pageNumber(),
+            readModel.pageSize(),
+            readModel.totalElements(),
+            readModel.totalPages(),
+            readModel.isLast()
+        );
+
+        RestResponse<List<EmpleadoRestResponse>> response = RestResponse.successPage(
+            HttpStatus.OK.value(),
+            "Listado de empleados obtenido exitosamente",
+            contentRest,
+            pagination
+        );
+
+        return ResponseEntity.ok(response);
     }
 }

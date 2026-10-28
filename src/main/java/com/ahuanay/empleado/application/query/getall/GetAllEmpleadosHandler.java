@@ -1,7 +1,7 @@
 package com.ahuanay.empleado.application.query.getall;
 
 import com.ahuanay.empleado.application.query.EmpleadoQueryRepository;
-import com.ahuanay.empleado.common.application.pagination.PagedReadModel;
+import com.ahuanay.mvccommon.application.pagination.PagedReadModel;
 
 public class GetAllEmpleadosHandler {
 

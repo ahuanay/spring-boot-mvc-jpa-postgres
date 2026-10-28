@@ -1,9 +1,9 @@
 package com.ahuanay.empleado.infrastructure.adapters.persistence.specification;
 
 import com.ahuanay.empleado.application.query.getall.GetAllEmpleadosQuery;
-import com.ahuanay.empleado.common.application.pagination.QueryPagination;
 import com.ahuanay.empleado.domain.enums.Puesto;
 import com.ahuanay.empleado.infrastructure.adapters.persistence.entity.EmpleadoEntity;
+import com.ahuanay.mvccommon.application.pagination.QueryPagination;
 import jakarta.persistence.criteria.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;

@@ -6,15 +6,15 @@ import com.ahuanay.empleado.application.command.delete.DeleteEmpleadoCommand;
 import com.ahuanay.empleado.application.command.delete.DeleteEmpleadoHandler;
 import com.ahuanay.empleado.application.command.update.UpdateEmpleadoCommand;
 import com.ahuanay.empleado.application.command.update.UpdateEmpleadoHandler;
-import com.ahuanay.empleado.common.infrastructure.entrypoints.rest.dto.ErrorRestResponse;
 import com.ahuanay.empleado.infrastructure.entrypoints.rest.dto.EmpleadoRestRequest;
 import com.ahuanay.empleado.infrastructure.entrypoints.rest.mapper.EmpleadoRestMapper;
+import com.ahuanay.mvccommon.infrastructure.entrypoints.rest.dto.RestResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponse; // Import directo sin conflictos
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -46,34 +46,30 @@ public class EmpleadoCommandController {
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "201",
-            description = "Empleado creado exitosamente en el sistema. Retorna el identificador asignado.",
+            description = "Empleado creado exitosamente en el sistema. Retorna el identificador asignado dentro del RestResponse.",
             content = @Content(
                 mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = Long.class, example = "105")
+                schema = @Schema(implementation = RestResponse.class)
             )
         ),
         @ApiResponse(
             responseCode = "400",
-            description = "Petición inválida por violación de invariantes del dominio (ej. correo duplicado o salario negativo) o por datos malformados en el DTO.",
+            description = "Petición inválida por violación de invariantes del dominio.",
             content = @Content(
                 mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = ErrorRestResponse.class),
-                examples = @ExampleObject(
-                    name = "EmailDuplicadoException",
-                    value = "{\"timestamp\": \"2026-10-27T14:30:00\", \"status\": 400, \"error\": \"Bad Request\", \"message\": \"Ya existe un empleado activo con el email: ahuanay@email.com\", \"path\": \"/api/v1/empleados\"}"
-                )
+                schema = @Schema(implementation = RestResponse.class)
             )
         ),
         @ApiResponse(
             responseCode = "409",
-            description = "Conflicto de unicidad detectado por la base de datos durante una escritura concurrente.",
+            description = "Conflicto de unicidad detectado.",
             content = @Content(
                 mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = ErrorRestResponse.class)
+                schema = @Schema(implementation = RestResponse.class)
             )
         )
     })
-    public ResponseEntity<Long> create(
+    public ResponseEntity<RestResponse<Long>> create(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "Estructura JSON con los datos requeridos para registrar al empleado.",
             required = true,
@@ -100,49 +96,38 @@ public class EmpleadoCommandController {
     ) {
         CreateEmpleadoCommand command = restMapper.toCreateCommand(request);
         Long empleadoId = createHandler.handle(command);
-        return ResponseEntity.status(HttpStatus.CREATED).body(empleadoId);
+
+        RestResponse<Long> response = RestResponse.success(
+            HttpStatus.CREATED.value(),
+            "Empleado creado exitosamente",
+            empleadoId
+        );
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(
         summary = "Actualizar datos de un empleado",
-        description = "Modifica la información de un empleado existente identificándolo por su ID. Verifica la existencia previa del registro y la unicidad del correo respetando su propia identidad."
+        description = "Modifica la información de un empleado existente identificándolo por su ID."
     )
     @ApiResponses(value = {
         @ApiResponse(
-            responseCode = "204",
-            description = "Empleado actualizado correctamente. La respuesta no contiene cuerpo."
+            responseCode = "200",
+            description = "Empleado actualizado correctamente."
         ),
         @ApiResponse(
             responseCode = "400",
-            description = "Parámetros inválidos o reglas de negocio violadas durante la actualización.",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = ErrorRestResponse.class)
-            )
+            description = "Parámetros inválidos.",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RestResponse.class))
         ),
         @ApiResponse(
             responseCode = "404",
-            description = "No se encontró ningún empleado activo con el ID proporcionado.",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = ErrorRestResponse.class),
-                examples = @ExampleObject(
-                    name = "EmpleadoNotFound",
-                    value = "{\"timestamp\": \"2026-10-27T14:30:00\", \"status\": 404, \"error\": \"Not Found\", \"message\": \"No se encontró el empleado con el ID: 99\", \"path\": \"/api/v1/empleados/99\"}"
-                )
-            )
-        ),
-        @ApiResponse(
-            responseCode = "409",
-            description = "Conflicto de unicidad detectado por la base de datos durante una escritura concurrente.",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = ErrorRestResponse.class)
-            )
+            description = "No se encontró el empleado.",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RestResponse.class))
         )
     })
-    public ResponseEntity<Void> update(
+    public ResponseEntity<RestResponse<Void>> update(
         @Parameter(description = "Identificador único (ID) del empleado a actualizar.", example = "105", required = true)
         @PathVariable Long id,
 
@@ -151,55 +136,50 @@ public class EmpleadoCommandController {
             required = true,
             content = @Content(
                 mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = EmpleadoRestRequest.class),
-                examples = @ExampleObject(
-                    name = "EmpleadoSenior",
-                    summary = "Actualización de los datos del empleado",
-                    value = """
-                        {
-                            "nombre": "Anderson Bryam",
-                            "apellido": "Huanay Carhuaricra",
-                            "email": "ahuanay@email.com",
-                            "puesto": "DESARROLLADOR_SENIOR",
-                            "salario": 4500,
-                            "fechaIngreso": "2026-10-26"
-                        }
-                        """
-                )
+                schema = @Schema(implementation = EmpleadoRestRequest.class)
             )
         )
         @Valid @RequestBody EmpleadoRestRequest request
     ) {
         UpdateEmpleadoCommand command = restMapper.toUpdateCommand(id, request);
         updateHandler.handle(command);
-        return ResponseEntity.noContent().build();
+
+        RestResponse<Void> response = RestResponse.success(
+            HttpStatus.OK.value(),
+            "Empleado actualizado correctamente"
+        );
+
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(
         summary = "Eliminar empleado (Soft Delete)",
-        description = "Ejecuta un borrado lógico estableciendo la marca de tiempo `deleted_at`. El registro deja de ser consultable en las búsquedas activas, liberando el correo único para futuros registros."
+        description = "Ejecuta un borrado lógico estableciendo la marca de tiempo `deleted_at`."
     )
     @ApiResponses(value = {
         @ApiResponse(
-            responseCode = "204",
-            description = "Empleado dado de baja exitosamente. La respuesta no contiene cuerpo."
+            responseCode = "200",
+            description = "Empleado dado de baja exitosamente."
         ),
         @ApiResponse(
             responseCode = "404",
-            description = "El empleado especificado no existe o ya fue eliminado anteriormente.",
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = ErrorRestResponse.class)
-            )
+            description = "El empleado especificado no existe.",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RestResponse.class))
         )
     })
-    public ResponseEntity<Void> delete(
+    public ResponseEntity<RestResponse<Void>> delete(
         @Parameter(description = "ID del empleado que será dado de baja.", example = "105", required = true)
         @PathVariable Long id
     ) {
         DeleteEmpleadoCommand command = new DeleteEmpleadoCommand(id);
         deleteHandler.handle(command);
-        return ResponseEntity.noContent().build();
+
+        RestResponse<Void> response = RestResponse.success(
+            HttpStatus.OK.value(),
+            "Empleado dado de baja exitosamente"
+        );
+
+        return ResponseEntity.ok(response);
     }
 }

@@ -1,8 +1,8 @@
 package com.ahuanay.empleado.infrastructure.adapters.persistence.specification;
 
 import com.ahuanay.empleado.application.query.getall.GetAllEmpleadosQuery;
-import com.ahuanay.empleado.common.infrastructure.adapters.persistence.JpaQueryUtils;
 import com.ahuanay.empleado.infrastructure.adapters.persistence.entity.EmpleadoEntity;
+import com.ahuanay.mvccommon.infrastructure.adapters.persistence.JpaQueryUtils;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;

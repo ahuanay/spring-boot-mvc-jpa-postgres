@@ -1,7 +1,7 @@
 package com.ahuanay.empleado.infrastructure.adapters.persistence.entity;
 
-import com.ahuanay.empleado.common.infrastructure.adapters.persistence.entity.AuditableEntity;
 import com.ahuanay.empleado.domain.enums.Puesto;
+import com.ahuanay.mvccommon.infrastructure.adapters.persistence.entity.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

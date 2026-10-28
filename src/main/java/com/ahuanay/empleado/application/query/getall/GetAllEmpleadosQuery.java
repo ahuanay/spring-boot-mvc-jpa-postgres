@@ -1,7 +1,7 @@
 package com.ahuanay.empleado.application.query.getall;
 
-import com.ahuanay.empleado.common.application.pagination.QueryPagination;
 import com.ahuanay.empleado.domain.enums.Puesto;
+import com.ahuanay.mvccommon.application.pagination.QueryPagination;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

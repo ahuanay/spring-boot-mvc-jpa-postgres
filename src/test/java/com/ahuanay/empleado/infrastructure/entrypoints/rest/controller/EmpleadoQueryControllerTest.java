@@ -6,12 +6,11 @@ import com.ahuanay.empleado.application.query.getall.GetAllEmpleadosQuery;
 import com.ahuanay.empleado.application.query.getbyid.EmpleadoDetailReadModel;
 import com.ahuanay.empleado.application.query.getbyid.GetByIdEmpleadoHandler;
 import com.ahuanay.empleado.application.query.getbyid.GetByIdEmpleadoQuery;
-import com.ahuanay.empleado.common.application.pagination.PagedReadModel;
-import com.ahuanay.empleado.common.infrastructure.entrypoints.rest.dto.PageRestResponse;
 import com.ahuanay.empleado.domain.enums.Puesto;
 import com.ahuanay.empleado.domain.exception.EmpleadoNotFoundException;
 import com.ahuanay.empleado.infrastructure.entrypoints.rest.dto.EmpleadoRestResponse;
 import com.ahuanay.empleado.infrastructure.entrypoints.rest.mapper.EmpleadoRestMapper;
+import com.ahuanay.mvccommon.application.pagination.PagedReadModel;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +45,7 @@ class EmpleadoQueryControllerTest {
     private EmpleadoRestMapper restMapper;
 
     @Test
-    @DisplayName("GET /api/v1/empleados/{id} - Debería retornar el detalle del empleado y status 200")
+    @DisplayName("GET /api/v1/empleados/{id} - Debería retornar el detalle del empleado y status 200 con RestResponse")
     void deberiaObtenerEmpleadoPorIdExitosamente() throws Exception {
         // Arrange
         Long empleadoId = 105L;
@@ -54,7 +53,7 @@ class EmpleadoQueryControllerTest {
             empleadoId,
             "Anderson Bryam",
             "Huanay Carhuaricra",
-            "anderson.ahuanay@example.com",
+            "ahuanay@example.com",
             Puesto.DESARROLLADOR_SENIOR,
             new BigDecimal("4500.00"),
             LocalDate.of(2025, 10, 15)
@@ -64,7 +63,7 @@ class EmpleadoQueryControllerTest {
             .id(empleadoId)
             .nombre("Anderson Bryam")
             .apellido("Huanay Carhuaricra")
-            .email("anderson.ahuanay@example.com")
+            .email("ahuanay@example.com")
             .puesto(Puesto.DESARROLLADOR_SENIOR)
             .salario(new BigDecimal("4500.00"))
             .fechaIngreso(LocalDate.of(2025, 10, 15))
@@ -77,18 +76,21 @@ class EmpleadoQueryControllerTest {
         mockMvc.perform(get("/api/v1/empleados/{id}", empleadoId)
                 .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(empleadoId))
-            .andExpect(jsonPath("$.nombre").value("Anderson Bryam"))
-            .andExpect(jsonPath("$.apellido").value("Huanay Carhuaricra"))
-            .andExpect(jsonPath("$.email").value("anderson.ahuanay@example.com"))
-            .andExpect(jsonPath("$.puesto").value("DESARROLLADOR_SENIOR"));
+            .andExpect(jsonPath("$.status").value(200))
+            .andExpect(jsonPath("$.success").value(true))
+            .andExpect(jsonPath("$.message").value("Detalle del empleado recuperado con éxito"))
+            .andExpect(jsonPath("$.data.id").value(empleadoId))
+            .andExpect(jsonPath("$.data.nombre").value("Anderson Bryam"))
+            .andExpect(jsonPath("$.data.apellido").value("Huanay Carhuaricra"))
+            .andExpect(jsonPath("$.data.email").value("ahuanay@example.com"))
+            .andExpect(jsonPath("$.data.puesto").value("DESARROLLADOR_SENIOR"));
 
         verify(getByIdHandler, times(1)).handle(any(GetByIdEmpleadoQuery.class));
         verify(restMapper, times(1)).toRestResponse(any(EmpleadoDetailReadModel.class));
     }
 
     @Test
-    @DisplayName("GET /api/v1/empleados/{id} - Debería retornar 404 cuando el ID consultado no existe")
+    @DisplayName("GET /api/v1/empleados/{id} - Debería retornar 404 con RestResponse y notFoundIds cuando el ID no existe")
     void deberiaRetornar404CuandoEmpleadoNoExiste() throws Exception {
         // Arrange
         Long empleadoId = 99L;
@@ -100,7 +102,7 @@ class EmpleadoQueryControllerTest {
                 .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.status").value(404))
-            .andExpect(jsonPath("$.error").value("Not Found"))
+            .andExpect(jsonPath("$.success").value(false))
             .andExpect(jsonPath("$.message").value("No se encontró el recurso solicitado."))
             .andExpect(jsonPath("$.notFoundIds[0]").value(99));
 
@@ -108,14 +110,14 @@ class EmpleadoQueryControllerTest {
     }
 
     @Test
-    @DisplayName("GET /api/v1/empleados - Debería retornar lista paginada de empleados y status 200")
+    @DisplayName("GET /api/v1/empleados - Debería retornar lista paginada de empleados con RestResponse y status 200")
     void deberiaListarEmpleadosPaginadosExitosamente() throws Exception {
         // Arrange
         EmpleadoSummaryReadModel resumenMock = new EmpleadoSummaryReadModel(
             105L,
             "Anderson Bryam",
             "Huanay Carhuaricra",
-            "anderson.ahuanay@example.com",
+            "ahuanay@example.com",
             Puesto.DESARROLLADOR_SENIOR
         );
 
@@ -132,21 +134,12 @@ class EmpleadoQueryControllerTest {
             .id(105L)
             .nombre("Anderson Bryam")
             .apellido("Huanay Carhuaricra")
-            .email("anderson.ahuanay@example.com")
+            .email("ahuanay@example.com")
             .puesto(Puesto.DESARROLLADOR_SENIOR)
             .build();
 
-        PageRestResponse<EmpleadoRestResponse> pageRest = new PageRestResponse<>(
-            List.of(restResponse),
-            0,
-            10,
-            1L,
-            1,
-            true
-        );
-
         when(getAllHandler.handle(any(GetAllEmpleadosQuery.class))).thenReturn(pagedMock);
-        when(restMapper.toPageRest(any())).thenReturn(pageRest);
+        when(restMapper.toRestResponse(any(EmpleadoSummaryReadModel.class))).thenReturn(restResponse);
 
         // Act & Assert
         mockMvc.perform(get("/api/v1/empleados")
@@ -156,12 +149,17 @@ class EmpleadoQueryControllerTest {
                 .param("direction", "ASC")
                 .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.content").isArray())
-            .andExpect(jsonPath("$.content[0].id").value(105L))
-            .andExpect(jsonPath("$.content[0].nombre").value("Anderson Bryam"))
-            .andExpect(jsonPath("$.totalElements").value(1));
+            .andExpect(jsonPath("$.status").value(200))
+            .andExpect(jsonPath("$.success").value(true))
+            .andExpect(jsonPath("$.message").value("Listado de empleados obtenido exitosamente"))
+            .andExpect(jsonPath("$.data").isArray())
+            .andExpect(jsonPath("$.data[0].id").value(105L))
+            .andExpect(jsonPath("$.data[0].nombre").value("Anderson Bryam"))
+            .andExpect(jsonPath("$.pagination.totalElements").value(1))
+            .andExpect(jsonPath("$.pagination.totalPages").value(1))
+            .andExpect(jsonPath("$.pagination.isLast").value(true));
 
         verify(getAllHandler, times(1)).handle(any(GetAllEmpleadosQuery.class));
-        verify(restMapper, times(1)).toPageRest(any());
+        verify(restMapper, times(1)).toRestResponse(any(EmpleadoSummaryReadModel.class));
     }
 }
